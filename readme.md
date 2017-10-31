@@ -60,6 +60,7 @@ Code Examples
 > **Example Interface for that class**
 ```java
     // You can declare any method with any return type or parameters this is just an example.
+    // Also know that you can declare as many methods and parameters as you see fit.
     public interface ISomeInterface{
         void onCustomMethod();
     }
