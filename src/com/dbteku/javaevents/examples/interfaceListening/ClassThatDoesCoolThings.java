@@ -9,7 +9,8 @@ public class ClassThatDoesCoolThings implements IEventThrower<ICoolThingsListene
 	/* Pretend this class is a service in your system.
 	 * Lets say you have other services that would like to listen to this one.
 	 * Usually you would have to give it access by an instance or some reference.
-	 * In this model this service will hold all of its listeners.
+	 * In this model this service will hold all of its listeners and notify them whenever needed.
+	 * You can also imagine this being thread safe with synchronized blocks but none are shown.
 	 */
 	
 	private final LinkedList<ICoolThingsListener> LISTENERS;
