@@ -1,4 +1,4 @@
-package com.dbteku.javaevents.examples.singleEventCalling;
+package com.dbteku.javaevents.examples.handlersAndInterfaces;
 
 interface IExampleEventListener {
 

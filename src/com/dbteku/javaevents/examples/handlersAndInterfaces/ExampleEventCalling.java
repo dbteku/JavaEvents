@@ -1,4 +1,4 @@
-package com.dbteku.javaevents.examples.singleEventCalling;
+package com.dbteku.javaevents.examples.handlersAndInterfaces;
 
 import com.dbteku.javaevents.EventManager;
 
@@ -10,7 +10,7 @@ class ExampleEventCalling {
 	public void throwingEvents(){
 		EventManager manager = EventManager.getInstance();
 		// Register an event with its handler.
-		manager.registerEvent(ExampleEvent.class, new ExampleHandler());
+		manager.registerEventWithHandler(ExampleEvent.class, new ExampleHandler());
 		
 		// Register a listener (Can be a concrete class or an anonymous inner class)
 		// Anonymous example

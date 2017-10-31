@@ -1,4 +1,4 @@
-package com.dbteku.javaevents.examples.singleEventCalling;
+package com.dbteku.javaevents.examples.handlersAndInterfaces;
 
 import com.dbteku.javaevents.interfaces.IEventHandler;
 import com.dbteku.javaevents.models.Event;

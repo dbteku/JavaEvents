@@ -1,5 +1,7 @@
 package com.dbteku.javaevents;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,9 +10,11 @@ import java.util.Map;
 import java.util.Queue;
 
 import com.dbteku.javaevents.exceptions.WrongListenerTypeException;
+import com.dbteku.javaevents.interfaces.EventListener;
 import com.dbteku.javaevents.interfaces.IEventHandler;
 import com.dbteku.javaevents.interfaces.IEventThrower;
 import com.dbteku.javaevents.models.Event;
+import com.dbteku.javaevents.models.NullEventHandler;
 
 public class EventManager {
 
@@ -67,7 +71,7 @@ public class EventManager {
 			}
 		}
 	}
-	
+
 	private <T> T convertObject(Class<T> cls, Object obj){
 		return cls.cast(obj);
 	}
@@ -126,7 +130,41 @@ public class EventManager {
 		}
 	}
 
-	public <E> void registerEvent(Class<E> eventClass, IEventHandler<?> handler){
+	public <E> void registerEvent(Class<E> eventClass){
+		synchronized (EVENT_LISTENERS) {
+			if(!EVENT_LISTENERS.containsKey(eventClass)){
+				EVENT_LISTENERS.put(eventClass, new EventListenerCenter(new IEventHandler<NullEventHandler>() {
+
+					@Override
+					public void handle(Event event, Object listener) {
+						final int FIRST = 0;
+						final int PARAM = 1;
+
+						Method[] methods = listener.getClass().getMethods();
+						for (int i = 0; i < methods.length; ++i) {
+							EventListener eventHandler = methods[i].getAnnotation(EventListener.class);
+							if (eventHandler != null) {
+								Class<?>[] methodParams = methods[i].getParameterTypes();
+								if(methodParams.length >= PARAM && event.getClass().getSimpleName().equals(methodParams[FIRST].getSimpleName())){
+									try {
+										methods[i].invoke(listener, event);
+									} catch (IllegalAccessException e) {
+										e.printStackTrace();
+									} catch (IllegalArgumentException e) {
+										e.printStackTrace();
+									} catch (InvocationTargetException e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						}
+					}
+				}, eventClass));
+			}	
+		}
+	}
+
+	public <E> void registerEventWithHandler(Class<E> eventClass, IEventHandler<?> handler){
 		synchronized (EVENT_LISTENERS) {
 			if(!EVENT_LISTENERS.containsKey(eventClass)){
 				EVENT_LISTENERS.put(eventClass, new EventListenerCenter(handler, eventClass));
@@ -143,7 +181,7 @@ public class EventManager {
 		}
 	}
 
-	public <E> void throwEvent(Event event){
+	public <E> void throwEvent(final Event event){
 		synchronized (EVENT_LISTENERS) {
 			if(EVENT_LISTENERS.containsKey(event.getClass())){
 				EventListenerCenter center = EVENT_LISTENERS.get(event.getClass());
@@ -153,7 +191,6 @@ public class EventManager {
 	}
 
 	private class EventListenerCenter{
-
 		private final IEventHandler<?> HANDLER;
 		private final LinkedHashSet<Object> LISTENERS;
 		private final Class<?> EVENT_CLASS;
