@@ -51,7 +51,7 @@ Code Examples
         
         public void somethingHappened(){
 	    for (ISomeInterface iSomeInterface : listeners) {
-	        iSomeInterface.onCustomEvent();
+	        iSomeInterface.onCustomMethod();
 	    }
         }
         
