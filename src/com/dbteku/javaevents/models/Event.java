@@ -8,7 +8,6 @@ public abstract class Event {
 		this.NAME = name;
 	}
 	
-	
 	public String getEventName() {
 		return NAME;
 	}
