@@ -1,4 +1,4 @@
-package com.dbteku.javaevents.examples;
+package com.dbteku.javaevents.examples.singleEventCalling;
 
 class ConcreteExample implements IExampleEventListener{
 
