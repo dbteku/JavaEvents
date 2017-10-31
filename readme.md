@@ -32,28 +32,24 @@ Code Examples
             EventManager.getInstance().registerThrower(ISomeInterface.class, this);
         }
         @Override
-	public void subscribe(IGameDaemonListener listener) {
-    		synchronized (listeners) {
-    			if(!listeners.contains(listener)){
-    				listeners.add(listener);
-    			}	
-    		}
+	    public void subscribe(IGameDaemonListener listener) {
+    	        if(!listeners.contains(listener)){
+    		    listeners.add(listener);
+    		}	
 	    }
 	@Override
 	public void unsubscribe(IGameDaemonListener listener) {
-    		synchronized (listeners) {
-    			listeners.remove(listener);	
-    		}
-	    }
+    	    listeners.remove(listener);	
+	}
     	@Override
     	public void clearSubscribers() {
-    		listeners.clear();
+    	    listeners.clear();
     	}
         
         public void somethingHappened(){
-			for (ISomeInterface iSomeInterface : listeners) {
-				iSomeInterface.onCustomEvent();
-			}
+	    for (ISomeInterface iSomeInterface : listeners) {
+	        iSomeInterface.onCustomEvent();
+	    }
         }
         
     }
@@ -162,11 +158,68 @@ Code Examples
 			public void onExampleEvent(ExampleEvent event) {
 				System.out.println("Anonymous got a call!");
 			}
+			//Concrete class listener
 			ConcreteClass concrete = new ConcreteClass();
-			
+			//Throw event.
 			EventManager.getInstance().throwEvent(new ExampleEvent());
 		}); 
     }
 ```
+
+> **Expected output:**
+> > Anonymous got a call!
+> > Concrete got a call!
+
+**Reflective Events:**
+**Example Event**
+```java
+    public class ExampleEvent extends Event{
+    
+    	private String someData;
+    	
+    	public ExampleEvent(String data) {
+    		super(ExampleEvent.class.getSimpleName());
+    		this.someData = data;
+    	}
+    
+    	public String getSomeData() {
+    		return someData;
+    	}
+    	
+    }
+```
+**Example Listener Class**
+```java
+    public class ConcreteClass{
+        public ConcreteClass(){
+            EventManager.getInstance().registerListener(ExampleEvent.class, this);
+        }
+        
+        //Add the EventListener annotation
+        //Note: It does not matter what the method name is called as long as the first parameter matches the event
+        // you subscribed to.
+        @EventListener
+        void onWhateverEvent(ExampleEvent event){
+            System.out.println("Reflective got a call!");
+        }
+        
+    }
+```
+**Calling Code**
+```java
+    public static void main(String[] args){
+            //Register Event
+            EventManager.getInstance().registerEvent(ExampleEvent.class);
+            //Have an instance of this class or any other class.
+			ConcreteClass concrete = new ConcreteClass();
+			//Throw event.
+			EventManager.getInstance().throwEvent(new ExampleEvent());
+			//Thats it! Easy
+		}); 
+    }
+```
+
+> **Expected output:**
+> > Reflective got a call!
 
 
