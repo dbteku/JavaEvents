@@ -4,7 +4,7 @@ node_modules/
 #################
 ## Eclipse
 #################
-
+gradle/
 *.pydevproject
 .project
 .metadata
