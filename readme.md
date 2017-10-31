@@ -178,6 +178,7 @@ Code Examples
 > Concrete got a call!
 
 **Reflective Events:**
+
 **Example Event**
 ```java
     public class ExampleEvent extends Event{
