@@ -15,77 +15,103 @@ There are three types of listening that you can do in **JavaEvents!**
 > **Listening Types:**
 
 > - Interface listening (Usefull for classes that have unique events)
-> - Event listening with custom handlers short acronym <strong>ELI</strong> (Useful for listening to an event with a respected interface)
+> - Event listening with custom handlers short acronym **ELH** (Useful for listening to an event with a respected interface)
 > - Reflective Event Listening (Useful for quick event handling)
 
-#### <i class="icon-code"></i> Code Examples
+Code Examples
+
 **InterfaceListening:**
 
-> **Example Custom Service Or Class**
-> <code>public class SomeClass implements &lt;IEventThrower&lt;ISomeInterface>>{
->  &nbsp;&nbsp;&nbsp; private LinkedList&lt;ISomeInterface> listeners;
->	&nbsp;&nbsp;&nbsp;&nbsp;public SomeClass(){
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.listeners = new LinkedList<>();
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Register the thrower
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EventManager.getInstance().registerThrower(ISomeInterface.class, this);
-> &nbsp;&nbsp;&nbsp;&nbsp;}
-> &nbsp;&nbsp;&nbsp;&nbsp;void subscribe(ISomeInterface listener){
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; listeners.add(listener);
-> &nbsp;&nbsp;&nbsp;&nbsp;}
-> &nbsp;&nbsp;&nbsp;&nbsp;void unsubscribe(ISomeInterface listener){
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; listeners.remove(listener);
-> &nbsp;&nbsp;&nbsp;&nbsp;}
->  &nbsp;&nbsp;&nbsp;&nbsp;void clearSubscribers(){
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; listeners.clear();
-> &nbsp;&nbsp;&nbsp;&nbsp;}
->  &nbsp;&nbsp;&nbsp;&nbsp;void somethingHappens(){
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for (ISomeInterface iSomeInterface: listeners) {
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iSomeInterface.onCustomMethod();
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-> &nbsp;&nbsp;&nbsp;&nbsp;}
->  }
->  </code>
+**Example Custom Service Or Class**
+
+```java
+    public class SomeClass implements IEventThrower<ISomeInterface>{
+        private LinkedList<ISomeInterface> listeners;
+        public SomeClass(){
+            this.listeners = new LinkedList<>();
+            EventManager.getInstance().registerThrower(ISomeInterface.class, this);
+        }
+        @Override
+	    public void subscribe(IGameDaemonListener listener) {
+    		synchronized (listeners) {
+    			if(!listeners.contains(listener)){
+    				listeners.add(listener);
+    			}	
+    		}
+	    }
+	    @Override
+	    public void unsubscribe(IGameDaemonListener listener) {
+    		synchronized (listeners) {
+    			listeners.remove(listener);	
+    		}
+	    }
+    	@Override
+    	public void clearSubscribers() {
+    		listeners.clear();
+    	}
+        
+        public void somethingHappened(){
+			for (ISomeInterface iSomeInterface : listeners) {
+				iSomeInterface.onCustomEvent();
+			}
+        }
+        
+    }
+```
 > **Example Interface for that class**
-> <code>public interface ISomeInterface{
-> // You obviously can create any methods in an interface with any return type and parameters
-> // but here is an example interface.
->	&nbsp;&nbsp;&nbsp;&nbsp;void onCustomMethod(){};
->  
-> </code>
+```java
+    // You can declare any method with any return type or parameters this is just an example.
+    public interface ISomeInterface{
+        void onCustomMethod();
+    }
+```
 > **Example Class that listens on that interface**
-> <code>public class SomeListenerClass implements ISomeInterface{
->	&nbsp;&nbsp;&nbsp;&nbsp;public SomeListenerClass(){
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Register listener.
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EventManager.getInstance().registerToInterface(ISomeInterface.class, this);
-> &nbsp;&nbsp;&nbsp;&nbsp;}
->	&nbsp;&nbsp;&nbsp;&nbsp;void onCustomMethod(){
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println("We got a call!");
-> &nbsp;&nbsp;&nbsp;&nbsp;}
->  
-> </code>
-> </code>
+```java
+    public SomeListenerClass implements ISomeInterface{
+        SomeListenerClass(){
+            EventManager.getInstance().registerToInterace(ISomeInterface.class,this);
+        }
+        
+        @Override
+        public void onCustomMethod(){
+            System.out.println("We got a call!");
+        }
+        
+    }
+```
 > **Example Calling Code**
-> <code>
-> public static void main(String[] args){
->  &nbsp;&nbsp;&nbsp;&nbsp;SomeClass someClass = new SomeClass();
->  &nbsp;&nbsp;&nbsp;&nbsp;SomeListenerClass listener = new SomeListenerClass();
->  &nbsp;&nbsp;&nbsp;&nbsp;someClass.somethingHappens();
-> }
-> </code>
+```java
+
+    public static void main(String[] args){ 
+        SomeClass someClass = new SomeClass(); 
+        SomeListenerClass listener = new SomeListenerClass(); 
+        someClass.somethingHappens(); 
+    } 
+```
 > **Expected output:**
-> > <i class="icon-terminal"></i>We got a call!
+> > We got a call!
 
-**ELI:**
+**Event Interfacing With Handlers:**
 
-> **Example Event**
-> <code>
-> public class ExampleEvent extends Event{
-> &nbsp;&nbsp;&nbsp;&nbsp;	private String someData;
-> &nbsp;&nbsp;&nbsp;&nbsp;	public ExampleEvent(String data) {
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.someData = someData;
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-> &nbsp;&nbsp;&nbsp;&nbsp; public String getSomeData(){
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return someData;
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-> }
-> </code>
+**Example Event**
+```java
+    public class ExampleEvent extends Event{
+    
+    	private String someData;
+    	
+    	public ExampleEvent(String data) {
+    		super(ExampleEvent.class.getSimpleName());
+    		this.someData = data;
+    	}
+    
+    	public String getSomeData() {
+    		return someData;
+    	}
+    	
+    }
+```
+**Example Interface**
+```java
+    public interface IExampleEventListener
+```
+
