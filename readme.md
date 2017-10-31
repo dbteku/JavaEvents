@@ -31,16 +31,19 @@ Code Examples
             this.listeners = new LinkedList<>();
             EventManager.getInstance().registerThrower(ISomeInterface.class, this);
         }
+	
         @Override
 	    public void subscribe(IGameDaemonListener listener) {
     	        if(!listeners.contains(listener)){
     		    listeners.add(listener);
     		}	
 	    }
+	    
 	@Override
 	public void unsubscribe(IGameDaemonListener listener) {
     	    listeners.remove(listener);	
 	}
+	
     	@Override
     	public void clearSubscribers() {
     	    listeners.clear();
