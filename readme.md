@@ -226,6 +226,7 @@ Code Examples
 ```
 
 > **Expected output:**
-> > Reflective got a call!
+
+> Reflective got a call!
 
 
