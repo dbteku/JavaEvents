@@ -20,7 +20,7 @@ There are three types of listening that you can do in **JavaEvents!**
 
 Code Examples
 
-**InterfaceListening:**
+**Interface Listening:**
 
 **Example Custom Service Or Class**
 
