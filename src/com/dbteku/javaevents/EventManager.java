@@ -1,9 +1,11 @@
 package com.dbteku.javaevents;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Queue;
 
 import com.dbteku.javaevents.exceptions.WrongListenerTypeException;
 import com.dbteku.javaevents.interfaces.IEventHandler;
@@ -16,10 +18,12 @@ public class EventManager {
 	private static EventManager instance;
 	private final Map<Class<?>, LinkedHashSet<IEventThrower<?>>> EVENT_THROWERS;
 	private Map<Class<?>, EventListenerCenter> EVENT_LISTENERS;
+	private Map<Class<?>, Queue<Object>> QUEUED_INTERFACE_LISTENERS;
 
 	private EventManager() {
 		this.EVENT_THROWERS = new HashMap<>();
 		this.EVENT_LISTENERS = new HashMap<>();
+		this.QUEUED_INTERFACE_LISTENERS = new HashMap<>();
 	}
 
 	public static EventManager getInstance(){
@@ -37,7 +41,7 @@ public class EventManager {
 		}
 	}
 
-	public void registerThrower(Class<?> interfaceClass, IEventThrower<?> thrower){
+	public <T> void registerThrower(Class<T> interfaceClass, IEventThrower<T> thrower){
 		synchronized (EVENT_THROWERS) {
 			LinkedHashSet<IEventThrower<?>> list = new LinkedHashSet<>();
 			if(EVENT_THROWERS.containsKey(interfaceClass)){
@@ -47,7 +51,25 @@ public class EventManager {
 				list.add(thrower);
 				EVENT_THROWERS.put(interfaceClass, list);
 			}
+			synchronized (QUEUED_INTERFACE_LISTENERS) {
+				if(QUEUED_INTERFACE_LISTENERS.containsKey(interfaceClass)){
+					Queue<Object> queue = QUEUED_INTERFACE_LISTENERS.get(interfaceClass);
+					LinkedHashSet<IEventThrower<?>> throwers = EVENT_THROWERS.get(interfaceClass);
+					for (IEventThrower<?> iEventThrower : throwers) {
+						@SuppressWarnings("unchecked")
+						IEventThrower<T> convertedThrower = convertObject(thrower.getClass(), iEventThrower);
+						for (Object object : queue) {
+							convertedThrower.subscribe(convertObject(interfaceClass, object));
+						}
+					}
+					QUEUED_INTERFACE_LISTENERS.remove(interfaceClass);
+				}	
+			}
 		}
+	}
+	
+	private <T> T convertObject(Class<T> cls, Object obj){
+		return cls.cast(obj);
 	}
 
 	public void unregisterThrower(Class<?> interfaceClass, IEventThrower<?> thrower){
@@ -74,6 +96,14 @@ public class EventManager {
 					}catch(ClassCastException e){
 						throw new WrongListenerTypeException();
 					}	
+				}
+			}else{
+				if(QUEUED_INTERFACE_LISTENERS.containsKey(interfaceClass)){
+					QUEUED_INTERFACE_LISTENERS.get(interfaceClass).add(listener);
+				}else{
+					Queue<Object> queue = new ArrayDeque<>();
+					queue.add(listener);
+					QUEUED_INTERFACE_LISTENERS.put(interfaceClass, queue);
 				}
 			}
 		}

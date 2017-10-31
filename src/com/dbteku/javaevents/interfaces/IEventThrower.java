@@ -4,9 +4,9 @@ public interface IEventThrower<T> {
 	
 	/**
 	 * Classes that handle specific events defined by you.
-	 * @param listener The listener you want to subscribe.
+	 * @param object The listener you want to subscribe.
 	 */
-	void subscribe(T listener);
+	void subscribe(T object);
 	/**
 	 * Classes that handle specific events defined by you.
 	 * @param listener The listener you want to unsubscribe.
