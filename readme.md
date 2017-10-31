@@ -32,15 +32,15 @@ Code Examples
             EventManager.getInstance().registerThrower(ISomeInterface.class, this);
         }
         @Override
-	    public void subscribe(IGameDaemonListener listener) {
+	public void subscribe(IGameDaemonListener listener) {
     		synchronized (listeners) {
     			if(!listeners.contains(listener)){
     				listeners.add(listener);
     			}	
     		}
 	    }
-	    @Override
-	    public void unsubscribe(IGameDaemonListener listener) {
+	@Override
+	public void unsubscribe(IGameDaemonListener listener) {
     		synchronized (listeners) {
     			listeners.remove(listener);	
     		}
@@ -112,6 +112,61 @@ Code Examples
 ```
 **Example Interface**
 ```java
-    public interface IExampleEventListener
+    public interface IExampleEventListener{
+        // Interface for event
+        void onExampleEvent(ExampleEvent event);
+    }
 ```
+**Example Handler**
+```java
+    class ExampleHandler implements IEventHandler<IExampleEventListener>{
+    
+    	public ExampleHandler() {
+    	}
+    
+    	// Handlers do all the conversion because java has type erasure :(
+    	// Converts the event and throws it to the listener.
+    	@Override
+    	public void handle(Event event, Object listener) {
+    		if(listener instanceof IExampleEventListener){
+    			IExampleEventListener eventListener = (IExampleEventListener) listener;
+    			eventListener.onExampleEvent((ExampleEvent)event);	
+    		}
+    	}
+    }
+```
+**Concrete Class Example**
+```java
+    public class ConcreteClass implements IExampleEventListener{
+        public ConcreteClass(){
+            // You can call this code anywhere it doesn't have to be in the class itself though its preferred.
+            EventManager.getInstance().registerListener(ExampleEvent.class, this);
+        }
+        
+        @Override
+        void onExampleEvent(ExampleEvent event){
+            System.out.println("Concrete got a call!");
+        }
+        
+    }
+```
+**Calling Code**
+```java
+    public static void main(String[] args){
+            //Register Event
+            EventManager.getInstance().registerEventWithHandler(ExampleEvent.class, new ExampleHandler());
+            //Listen to event anonymous inner class
+            EventManager.getInstance().registerListener(ExampleEvent.class, new IExampleEventListener() {
+			
+			@Override
+			public void onExampleEvent(ExampleEvent event) {
+				System.out.println("Anonymous got a call!");
+			}
+			ConcreteClass concrete = new ConcreteClass();
+			
+			EventManager.getInstance().throwEvent(new ExampleEvent());
+		}); 
+    }
+```
+
 
