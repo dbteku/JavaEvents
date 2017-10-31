@@ -88,7 +88,8 @@ Code Examples
     } 
 ```
 > **Expected output:**
-> > We got a call!
+
+>  We got a call!
 
 **Event Interfacing With Handlers:**
 
