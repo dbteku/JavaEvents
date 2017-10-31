@@ -170,8 +170,8 @@ Code Examples
 ```
 
 > **Expected output:**
-> > Anonymous got a call!
-> > Concrete got a call!
+> Anonymous got a call!
+> Concrete got a call!
 
 **Reflective Events:**
 **Example Event**
