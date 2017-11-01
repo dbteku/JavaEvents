@@ -22,12 +22,12 @@ public class EventManager {
 	private static EventManager instance;
 	private final Map<Class<?>, LinkedHashSet<IEventThrower<?>>> EVENT_THROWERS;
 	private Map<Class<?>, EventListenerCenter> EVENT_LISTENERS;
-	private Map<Class<?>, Queue<Object>> QUEUED_INTERFACE_LISTENERS;
+	private Map<Class<?>, Queue<Object>> QUEUED_LISTENERS;
 
 	private EventManager() {
 		this.EVENT_THROWERS = new HashMap<>();
 		this.EVENT_LISTENERS = new HashMap<>();
-		this.QUEUED_INTERFACE_LISTENERS = new HashMap<>();
+		this.QUEUED_LISTENERS = new HashMap<>();
 	}
 
 	public static EventManager getInstance(){
@@ -55,9 +55,9 @@ public class EventManager {
 				list.add(thrower);
 				EVENT_THROWERS.put(interfaceClass, list);
 			}
-			synchronized (QUEUED_INTERFACE_LISTENERS) {
-				if(QUEUED_INTERFACE_LISTENERS.containsKey(interfaceClass)){
-					Queue<Object> queue = QUEUED_INTERFACE_LISTENERS.get(interfaceClass);
+			synchronized (QUEUED_LISTENERS) {
+				if(QUEUED_LISTENERS.containsKey(interfaceClass)){
+					Queue<Object> queue = QUEUED_LISTENERS.get(interfaceClass);
 					LinkedHashSet<IEventThrower<?>> throwers = EVENT_THROWERS.get(interfaceClass);
 					for (IEventThrower<?> iEventThrower : throwers) {
 						@SuppressWarnings("unchecked")
@@ -66,7 +66,7 @@ public class EventManager {
 							convertedThrower.subscribe(convertObject(interfaceClass, object));
 						}
 					}
-					QUEUED_INTERFACE_LISTENERS.remove(interfaceClass);
+					QUEUED_LISTENERS.remove(interfaceClass);
 				}	
 			}
 		}
@@ -102,12 +102,12 @@ public class EventManager {
 					}	
 				}
 			}else{
-				if(QUEUED_INTERFACE_LISTENERS.containsKey(interfaceClass)){
-					QUEUED_INTERFACE_LISTENERS.get(interfaceClass).add(listener);
+				if(QUEUED_LISTENERS.containsKey(interfaceClass)){
+					QUEUED_LISTENERS.get(interfaceClass).add(listener);
 				}else{
 					Queue<Object> queue = new ArrayDeque<>();
 					queue.add(listener);
-					QUEUED_INTERFACE_LISTENERS.put(interfaceClass, queue);
+					QUEUED_LISTENERS.put(interfaceClass, queue);
 				}
 			}
 		}
@@ -160,6 +160,15 @@ public class EventManager {
 						}
 					}
 				}, eventClass));
+				synchronized (QUEUED_LISTENERS) {
+					if(QUEUED_LISTENERS.containsKey(eventClass)){
+						Queue<?> queue = QUEUED_LISTENERS.get(eventClass);
+						for (Object object : queue) {
+							EVENT_LISTENERS.get(eventClass).add(object);
+						}
+						QUEUED_LISTENERS.remove(eventClass);
+					}	
+				}	
 			}	
 		}
 	}
@@ -168,6 +177,15 @@ public class EventManager {
 		synchronized (EVENT_LISTENERS) {
 			if(!EVENT_LISTENERS.containsKey(eventClass)){
 				EVENT_LISTENERS.put(eventClass, new EventListenerCenter(handler, eventClass));
+				synchronized (QUEUED_LISTENERS) {
+					if(QUEUED_LISTENERS.containsKey(eventClass)){
+						Queue<?> queue = QUEUED_LISTENERS.get(eventClass);
+						for (Object object : queue) {
+							EVENT_LISTENERS.get(eventClass).add(object);
+						}
+						QUEUED_LISTENERS.remove(eventClass);
+					}	
+				}
 			}	
 		}
 	}
@@ -177,7 +195,15 @@ public class EventManager {
 			if(EVENT_LISTENERS.containsKey(eventClass)){
 				EventListenerCenter center = EVENT_LISTENERS.get(eventClass);
 				center.add(listener);
-			}	
+			}else{
+				if(QUEUED_LISTENERS.containsKey(eventClass)){
+					QUEUED_LISTENERS.get(eventClass).add(listener);
+				}else{
+					Queue<Object> queue = new ArrayDeque<>();
+					queue.add(listener);
+					QUEUED_LISTENERS.put(eventClass, queue);
+				}
+			}
 		}
 	}
 
@@ -202,18 +228,22 @@ public class EventManager {
 		}
 
 		private void throwEvent(Event event){
-			if(event.getClass().equals(EVENT_CLASS)){
-				Iterator<?> listeners = LISTENERS.iterator();
-				while(listeners.hasNext()){
-					Object obj = listeners.next();
-					HANDLER.handle(event, obj);
-				}
+			synchronized (LISTENERS) {
+				if(event.getClass().equals(EVENT_CLASS)){
+					Iterator<?> listeners = LISTENERS.iterator();
+					while(listeners.hasNext()){
+						Object obj = listeners.next();
+						HANDLER.handle(event, obj);
+					}
+				}	
 			}
 		}
 
 		private<L> void add(L listener){
-			if(!LISTENERS.contains(listener)){
-				LISTENERS.add(listener);
+			synchronized (LISTENERS) {
+				if(!LISTENERS.contains(listener)){
+					LISTENERS.add(listener);
+				}	
 			}
 		}
 	}
