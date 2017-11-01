@@ -94,7 +94,7 @@ Code Examples
 
 **Event Interfacing With Handlers:**
 
-**Example Event**
+> **Example Event**
 ```java
     public class ExampleEvent extends Event{
     
@@ -111,16 +111,16 @@ Code Examples
     	
     }
 ```
-**Example Interface**
+> **Example Interface**
 ```java
     public interface IExampleEventListener{
         // Interface for event
         void onExampleEvent(ExampleEvent event);
     }
 ```
-**Example Handler**
+> **Example Handler**
 ```java
-    class ExampleHandler implements IEventHandler<IExampleEventListener>{
+    public class ExampleHandler implements IEventHandler<IExampleEventListener>{
     
     	public ExampleHandler() {
     	}
@@ -136,7 +136,7 @@ Code Examples
     	}
     }
 ```
-**Concrete Class Example**
+> **Concrete Class Example**
 ```java
     public class ConcreteClass implements IExampleEventListener{
         public ConcreteClass(){
@@ -151,7 +151,7 @@ Code Examples
         
     }
 ```
-**Calling Code**
+> **Calling Code**
 ```java
     public static void main(String[] args){
             //Register Event
@@ -179,7 +179,7 @@ Code Examples
 
 **Reflective Events:**
 
-**Example Event**
+> **Example Event**
 ```java
     public class ExampleEvent extends Event{
     
@@ -196,7 +196,7 @@ Code Examples
     	
     }
 ```
-**Example Listener Class**
+> **Example Listener Class**
 ```java
     public class ConcreteClass{
         public ConcreteClass(){
@@ -213,7 +213,7 @@ Code Examples
         
     }
 ```
-**Calling Code**
+> **Calling Code**
 ```java
     public static void main(String[] args){
             //Register Event
