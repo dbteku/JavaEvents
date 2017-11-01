@@ -33,14 +33,14 @@ Code Examples
         }
 	
         @Override
-	    public void subscribe(IGameDaemonListener listener) {
+	    public void subscribe(ISomeInterface listener) {
     	        if(!listeners.contains(listener)){
     		    listeners.add(listener);
     		}	
 	    }
 	    
 	@Override
-	public void unsubscribe(IGameDaemonListener listener) {
+	public void unsubscribe(ISomeInterface listener) {
     	    listeners.remove(listener);	
 	}
 	
@@ -48,6 +48,16 @@ Code Examples
     	public void clearSubscribers() {
     	    listeners.clear();
     	}
+	
+	@Override
+	public boolean isAnyoneListening() {
+		return !listeners.isEmpty();
+	}
+
+	@Override
+	public Iterator<ISomeInterface> getSubscribers() {
+		return listeners.iterator();
+	}
         
         public void somethingHappened(){
 	    for (ISomeInterface iSomeInterface : listeners) {
