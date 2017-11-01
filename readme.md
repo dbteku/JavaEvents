@@ -33,11 +33,11 @@ Code Examples
         }
 	
         @Override
-	    public void subscribe(ISomeInterface listener) {
-    	        if(!listeners.contains(listener)){
-    		    listeners.add(listener);
-    		}	
-	    }
+	public void subscribe(ISomeInterface listener) {
+    	     if(!listeners.contains(listener)){
+    		  listeners.add(listener);
+    	     }	
+	}
 	    
 	@Override
 	public void unsubscribe(ISomeInterface listener) {
