@@ -77,9 +77,26 @@ public class EventManager {
 	}
 
 	public void unregisterThrower(Class<?> interfaceClass, IEventThrower<?> thrower){
+		unregisterThrower(interfaceClass, thrower, false);
+	}
+	
+	public void unregisterThrower(Class<?> interfaceClass, IEventThrower<?> thrower, boolean keepSubscribers){
 		synchronized (EVENT_THROWERS) {
 			if(EVENT_THROWERS.containsKey(interfaceClass)){
 				LinkedHashSet<IEventThrower<?>> list = EVENT_THROWERS.get(interfaceClass);
+				if(keepSubscribers){
+					Queue<Object> toKeep = new ArrayDeque<>();
+					Iterator<?> subscribers = thrower.getSubscribers();
+					while(subscribers.hasNext()){
+						Object listener = subscribers.next();
+						toKeep.add(listener);
+					}
+					if(!QUEUED_LISTENERS.containsKey(interfaceClass)){
+						QUEUED_LISTENERS.put(interfaceClass, toKeep);
+					}
+				}else{
+					thrower.clearSubscribers();
+				}
 				list.remove(thrower);
 				if(list.isEmpty()){
 					EVENT_THROWERS.remove(interfaceClass);	

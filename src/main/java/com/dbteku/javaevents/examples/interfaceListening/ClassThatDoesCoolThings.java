@@ -1,5 +1,6 @@
 package com.dbteku.javaevents.examples.interfaceListening;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.dbteku.javaevents.interfaces.IEventThrower;
@@ -53,6 +54,16 @@ public class ClassThatDoesCoolThings implements IEventThrower<ICoolThingsListene
 	@Override
 	public void clearSubscribers() {
 		LISTENERS.clear();
+	}
+
+	@Override
+	public boolean isAnyoneListening() {
+		return !LISTENERS.isEmpty();
+	}
+
+	@Override
+	public Iterator<ICoolThingsListener> getSubscribers() {
+		return LISTENERS.iterator();
 	}
 
 }

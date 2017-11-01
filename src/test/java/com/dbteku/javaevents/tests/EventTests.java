@@ -1,7 +1,5 @@
 package com.dbteku.javaevents.tests;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.dbteku.javaevents.EventManager;

@@ -1,5 +1,7 @@
 package com.dbteku.javaevents.interfaces;
 
+import java.util.Iterator;
+
 public interface IEventThrower<T> {
 	
 	/**
@@ -14,6 +16,10 @@ public interface IEventThrower<T> {
 	void unsubscribe(T listener);
 	
 	void clearSubscribers();
+	
+	boolean isAnyoneListening();
+	
+	Iterator<T> getSubscribers();
 	
 }
 
