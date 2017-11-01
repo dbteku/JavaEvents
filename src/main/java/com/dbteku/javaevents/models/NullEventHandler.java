@@ -2,7 +2,6 @@ package com.dbteku.javaevents.models;
 
 import com.dbteku.javaevents.interfaces.IEventHandler;
 import com.dbteku.javaevents.interfaces.INullEventListener;
-import com.dbteku.javaevents.models.Event;
 
 public class NullEventHandler implements IEventHandler<INullEventListener>{
 
