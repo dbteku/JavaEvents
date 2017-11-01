@@ -51,12 +51,12 @@ Code Examples
 	
 	@Override
 	public boolean isAnyoneListening() {
-		return !listeners.isEmpty();
+	    return !listeners.isEmpty();
 	}
 
 	@Override
 	public Iterator<ISomeInterface> getSubscribers() {
-		return listeners.iterator();
+	    return listeners.iterator();
 	}
         
         public void somethingHappened(){
