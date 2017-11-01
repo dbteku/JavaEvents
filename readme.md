@@ -34,9 +34,9 @@ Code Examples
 	
         @Override
 	public void subscribe(ISomeInterface listener) {
-    	     if(!listeners.contains(listener)){
-    		  listeners.add(listener);
-    	     }	
+    	    if(!listeners.contains(listener)){
+    		 listeners.add(listener);
+    	    }	
 	}
 	    
 	@Override
