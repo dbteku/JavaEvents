@@ -176,7 +176,7 @@ Code Examples
 			//Concrete class listener
 			ConcreteClass concrete = new ConcreteClass();
 			//Throw event.
-			EventManager.getInstance().throwEvent(new ExampleEvent());
+			EventManager.getInstance().throwEvent(new ExampleEvent("Data"));
 		}); 
     }
 ```
@@ -231,7 +231,7 @@ Code Examples
             //Have an instance of this class or any other class.
 			ConcreteClass concrete = new ConcreteClass();
 			//Throw event.
-			EventManager.getInstance().throwEvent(new ExampleEvent());
+			EventManager.getInstance().throwEvent(new ExampleEvent("Data"));
 			//Thats it! Easy
 		}); 
     }
