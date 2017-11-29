@@ -1,11 +1,11 @@
 package com.dbteku.javaevents.models;
 
-public abstract class Event {
+public abstract class JavaEvent {
 
 	private final String NAME;
 	private boolean cancelled;
 	
-	public Event(String name) {
+	public JavaEvent(String name) {
 		this.NAME = name;
 	}
 	

@@ -13,7 +13,7 @@ import com.dbteku.javaevents.exceptions.WrongListenerTypeException;
 import com.dbteku.javaevents.interfaces.EventListener;
 import com.dbteku.javaevents.interfaces.IEventHandler;
 import com.dbteku.javaevents.interfaces.IEventThrower;
-import com.dbteku.javaevents.models.Event;
+import com.dbteku.javaevents.models.JavaEvent;
 import com.dbteku.javaevents.models.NullEventHandler;
 
 public class EventManager {
@@ -153,7 +153,7 @@ public class EventManager {
 				EVENT_LISTENERS.put(eventClass, new EventListenerCenter(new IEventHandler<NullEventHandler>() {
 
 					@Override
-					public void handle(Event event, Object listener) {
+					public void handle(JavaEvent event, Object listener) {
 						final int FIRST = 0;
 						final int PARAM = 1;
 
@@ -224,7 +224,7 @@ public class EventManager {
 		}
 	}
 
-	public <E> void throwEvent(final Event event){
+	public <E> void throwEvent(final JavaEvent event){
 		synchronized (EVENT_LISTENERS) {
 			if(EVENT_LISTENERS.containsKey(event.getClass())){
 				EventListenerCenter center = EVENT_LISTENERS.get(event.getClass());
@@ -244,7 +244,7 @@ public class EventManager {
 			this.EVENT_CLASS = eventClass;
 		}
 
-		private void throwEvent(Event event){
+		private void throwEvent(JavaEvent event){
 			synchronized (LISTENERS) {
 				if(event.getClass().equals(EVENT_CLASS)){
 					Iterator<?> listeners = LISTENERS.iterator();

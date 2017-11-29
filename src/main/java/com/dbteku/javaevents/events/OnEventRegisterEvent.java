@@ -1,8 +1,8 @@
 package com.dbteku.javaevents.events;
 
-import com.dbteku.javaevents.models.Event;
+import com.dbteku.javaevents.models.JavaEvent;
 
-public class OnEventRegisterEvent extends Event{
+public class OnEventRegisterEvent extends JavaEvent{
 	
 	private final Class<?> EVENT_CLASS;
 	

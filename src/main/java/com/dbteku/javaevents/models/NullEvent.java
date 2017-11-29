@@ -1,6 +1,6 @@
 package com.dbteku.javaevents.models;
 
-public class NullEvent extends Event{
+public class NullEvent extends JavaEvent{
 
 	public NullEvent() {
 		super(NullEvent.class.getSimpleName());

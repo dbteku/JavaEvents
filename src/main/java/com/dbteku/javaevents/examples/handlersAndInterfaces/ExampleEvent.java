@@ -1,8 +1,8 @@
 package com.dbteku.javaevents.examples.handlersAndInterfaces;
 
-import com.dbteku.javaevents.models.Event;
+import com.dbteku.javaevents.models.JavaEvent;
 
-class ExampleEvent extends Event{
+class ExampleEvent extends JavaEvent{
 
 	private String someData;
 	

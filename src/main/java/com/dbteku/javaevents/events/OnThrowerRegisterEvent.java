@@ -1,9 +1,9 @@
 package com.dbteku.javaevents.events;
 
 import com.dbteku.javaevents.interfaces.IEventThrower;
-import com.dbteku.javaevents.models.Event;
+import com.dbteku.javaevents.models.JavaEvent;
 
-public class OnThrowerRegisterEvent extends Event{
+public class OnThrowerRegisterEvent extends JavaEvent{
 	
 	private final IEventThrower<?> THROWER;
 	
