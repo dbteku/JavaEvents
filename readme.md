@@ -106,7 +106,7 @@ Code Examples
 
 > **Example Event**
 ```java
-    public class ExampleEvent extends Event{
+    public class ExampleEvent extends JavaEvent{
     
     	private String someData;
     	
@@ -191,7 +191,7 @@ Code Examples
 
 > **Example Event**
 ```java
-    public class ExampleEvent extends Event{
+    public class ExampleEvent extends JavaEvent{
     
     	private String someData;
     	
