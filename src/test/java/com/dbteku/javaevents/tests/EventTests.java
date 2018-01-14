@@ -9,7 +9,7 @@ public class EventTests {
 
 	@Test
 	public void test() {
-		EventManager.getInstance().registerListener(TestEvent.class, this);
+		EventManager.getInstance().registerEventListener(TestEvent.class, this);
 		EventManager.getInstance().registerEvent(TestEvent.class);
 		EventManager.getInstance().throwEvent(new TestEvent());
 	}

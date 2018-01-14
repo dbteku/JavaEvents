@@ -20,7 +20,7 @@ class ExampleClassWithEventListener {
 		EventManager.getInstance().registerEvent(NullEvent.class);
 		
 		//Listen to that event.
-		EventManager.getInstance().registerListener(NullEvent.class, this);
+		EventManager.getInstance().registerEventListener(NullEvent.class, this);
 		
 		EventManager.getInstance().throwEvent(new NullEvent());
 	}

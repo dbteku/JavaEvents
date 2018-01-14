@@ -189,6 +189,14 @@ public class EventManager {
 			}	
 		}
 	}
+	
+	public <E> void unregisterEvent(Class<E> eventClass) {
+		synchronized (EVENT_LISTENERS) {
+			if(EVENT_LISTENERS.containsKey(eventClass)) {
+				EVENT_LISTENERS.remove(eventClass);
+			}
+		}
+	}
 
 	public <E> void registerEventWithHandler(Class<E> eventClass, IEventHandler<?> handler){
 		synchronized (EVENT_LISTENERS) {
@@ -207,7 +215,7 @@ public class EventManager {
 		}
 	}
 
-	public <E, I, L> void registerListener(Class<E> eventClass, L listener){
+	public <E, I, L> void registerEventListener(Class<E> eventClass, L listener){
 		synchronized (EVENT_LISTENERS) {
 			if(EVENT_LISTENERS.containsKey(eventClass)){
 				EventListenerCenter center = EVENT_LISTENERS.get(eventClass);
@@ -220,6 +228,15 @@ public class EventManager {
 					queue.add(listener);
 					QUEUED_LISTENERS.put(eventClass, queue);
 				}
+			}
+		}
+	}
+	
+	public <E, L> void unregisterEventListener(Class<E> eventClass, L listener){
+		synchronized (EVENT_LISTENERS) {
+			if(EVENT_LISTENERS.containsKey(eventClass)) {
+				EventListenerCenter center = EVENT_LISTENERS.get(eventClass);
+				center.remove(listener);
 			}
 		}
 	}
@@ -263,6 +280,11 @@ public class EventManager {
 				}	
 			}
 		}
+		
+		private <L> void remove(L listener){
+			LISTENERS.remove(listener);
+		}
+		
 	}
 
 }

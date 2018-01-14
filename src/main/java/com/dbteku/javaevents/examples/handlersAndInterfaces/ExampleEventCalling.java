@@ -14,7 +14,7 @@ class ExampleEventCalling {
 		
 		// Register a listener (Can be a concrete class or an anonymous inner class)
 		// Anonymous example
-		manager.registerListener(ExampleEvent.class, new IExampleEventListener() {
+		manager.registerEventListener(ExampleEvent.class, new IExampleEventListener() {
 			
 			@Override
 			public void onExampleEvent(ExampleEvent event) {
@@ -25,7 +25,7 @@ class ExampleEventCalling {
 		});
 		
 		// Concrete Example
-		manager.registerListener(ExampleEvent.class, new ConcreteExample());
+		manager.registerEventListener(ExampleEvent.class, new ConcreteExample());
 		
 		//Throw Event
 		manager.throwEvent(new ExampleEvent("This is an example event"));
