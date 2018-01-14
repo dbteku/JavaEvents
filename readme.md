@@ -14,7 +14,7 @@ There are three types of listening that you can do in **JavaEvents!**
 
 > **Listening Types:**
 
-> - Interface listening (Usefull for classes that have unique events)
+> - Interface listening (Usefull for classes that have unique events or is a service)
 > - Event listening with custom handlers short acronym **ELH** (Useful for listening to an event with a respected interface)
 > - Reflective Event Listening (Useful for quick event handling)
 
@@ -106,7 +106,7 @@ Code Examples
 
 > **Example Event**
 ```java
-    public class ExampleEvent extends Event{
+    public class ExampleEvent extends JavaEvent{
     
     	private String someData;
     	
@@ -191,7 +191,7 @@ Code Examples
 
 > **Example Event**
 ```java
-    public class ExampleEvent extends Event{
+    public class ExampleEvent extends JavaEvent{
     
     	private String someData;
     	
