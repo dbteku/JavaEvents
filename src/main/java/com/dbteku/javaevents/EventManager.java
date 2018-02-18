@@ -264,10 +264,9 @@ public class EventManager {
 		private void throwEvent(JavaEvent event){
 			synchronized (LISTENERS) {
 				if(event.getClass().equals(EVENT_CLASS)){
-					Iterator<?> listeners = LISTENERS.iterator();
-					while(listeners.hasNext()){
-						Object obj = listeners.next();
-						HANDLER.handle(event, obj);
+					Object[] listeners = LISTENERS.toArray();
+					for (Object object : listeners) {
+						HANDLER.handle(event, object);
 					}
 				}	
 			}
