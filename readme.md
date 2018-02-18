@@ -79,7 +79,7 @@ Code Examples
 ```java
     public SomeListenerClass implements ISomeInterface{
         SomeListenerClass(){
-            EventManager.getInstance().registerToInterace(ISomeInterface.class,this);
+            EventManager.getInstance().registerToInterface(ISomeInterface.class,this);
         }
         
         @Override
