@@ -14,9 +14,9 @@ There are three types of listening that you can do in **JavaEvents!**
 
 > **Listening Types:**
 
+> - Reflective Event Listening (Useful for quick event handling)
 > - Interface listening (Usefull for classes that have unique events or is a service)
 > - Event listening with custom handlers short acronym **ELH** (Useful for listening to an event with a respected interface)
-> - Reflective Event Listening (Useful for quick event handling)
 
 Code Examples
 
