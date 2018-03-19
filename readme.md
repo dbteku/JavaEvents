@@ -7,7 +7,7 @@ The purpose of  **JavaEvents** is to make events a little easier for you when yo
 ----------
 
 
-Features
+##Features
 -------------
 
 There are three types of listening that you can do in **JavaEvents!**
@@ -20,7 +20,7 @@ There are three types of listening that you can do in **JavaEvents!**
 
 Code Examples
 
-**Interface Listening:**
+**##Interface Listening:**
 
 **Example Custom Service Or Class**
 
@@ -102,7 +102,7 @@ Code Examples
 
 >  We got a call!
 
-**Event Interfacing With Handlers:**
+**##Event Interfacing With Handlers:**
 
 > **Example Event**
 ```java
@@ -187,7 +187,7 @@ Code Examples
 
 > Concrete got a call!
 
-**Reflective Events:**
+**##Reflective Events:**
 
 > **Example Event**
 ```java
