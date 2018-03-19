@@ -62,11 +62,10 @@ Code Examples
             //Register Event
             EventManager.getInstance().registerEvent(ExampleEvent.class);
             //Have an instance of this class or any other class.
-			ConcreteClass concrete = new ConcreteClass();
-			//Throw event.
-			EventManager.getInstance().throwEvent(new ExampleEvent("Data"));
-			//Thats it! Easy
-		}); 
+	    ConcreteClass concrete = new ConcreteClass();
+	    //Throw event.
+	    EventManager.getInstance().throwEvent(new ExampleEvent("Data"));
+	    //Thats it! Easy
     }
 ```
 
