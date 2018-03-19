@@ -7,7 +7,7 @@ The purpose of  **JavaEvents** is to make events a little easier for you when yo
 ----------
 
 
-#Features
+Features
 -------------
 
 There are three types of listening that you can do in **JavaEvents!**
