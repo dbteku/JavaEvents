@@ -210,7 +210,7 @@ Code Examples
 ```java
     public class ConcreteClass{
         public ConcreteClass(){
-            EventManager.getInstance().registerListener(ExampleEvent.class, this);
+            EventManager.getInstance().registerEventListener(ExampleEvent.class, this);
         }
         
         //Add the EventListener annotation
