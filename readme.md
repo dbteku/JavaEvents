@@ -20,6 +20,60 @@ There are three types of listening that you can do in **JavaEvents!**
 
 Code Examples
 
+## Reflective Events ##
+
+> **Example Event**
+```java
+    public class ExampleEvent extends JavaEvent{
+    
+    	private String someData;
+    	
+    	public ExampleEvent(String data) {
+    		super(ExampleEvent.class.getSimpleName());
+    		this.someData = data;
+    	}
+    
+    	public String getSomeData() {
+    		return someData;
+    	}
+    	
+    }
+```
+> **Example Listener Class**
+```java
+    public class ConcreteClass{
+        public ConcreteClass(){
+            EventManager.getInstance().registerEventListener(ExampleEvent.class, this);
+        }
+        
+        //Add the EventListener annotation
+        //Note: It does not matter what the method name is called as long as the first parameter matches the event
+        // you subscribed to.
+        @EventListener
+        void onWhateverEvent(ExampleEvent event){
+            System.out.println("Reflective got a call!");
+        }
+        
+    }
+```
+> **Calling Code**
+```java
+    public static void main(String[] args){
+            //Register Event
+            EventManager.getInstance().registerEvent(ExampleEvent.class);
+            //Have an instance of this class or any other class.
+			ConcreteClass concrete = new ConcreteClass();
+			//Throw event.
+			EventManager.getInstance().throwEvent(new ExampleEvent("Data"));
+			//Thats it! Easy
+		}); 
+    }
+```
+
+> **Expected output:**
+
+> Reflective got a call!
+
 ## Interface Listening ##
 
 **Example Custom Service Or Class**
@@ -186,59 +240,4 @@ Code Examples
 > Anonymous got a call!
 
 > Concrete got a call!
-
-## Reflective Events ##
-
-> **Example Event**
-```java
-    public class ExampleEvent extends JavaEvent{
-    
-    	private String someData;
-    	
-    	public ExampleEvent(String data) {
-    		super(ExampleEvent.class.getSimpleName());
-    		this.someData = data;
-    	}
-    
-    	public String getSomeData() {
-    		return someData;
-    	}
-    	
-    }
-```
-> **Example Listener Class**
-```java
-    public class ConcreteClass{
-        public ConcreteClass(){
-            EventManager.getInstance().registerEventListener(ExampleEvent.class, this);
-        }
-        
-        //Add the EventListener annotation
-        //Note: It does not matter what the method name is called as long as the first parameter matches the event
-        // you subscribed to.
-        @EventListener
-        void onWhateverEvent(ExampleEvent event){
-            System.out.println("Reflective got a call!");
-        }
-        
-    }
-```
-> **Calling Code**
-```java
-    public static void main(String[] args){
-            //Register Event
-            EventManager.getInstance().registerEvent(ExampleEvent.class);
-            //Have an instance of this class or any other class.
-			ConcreteClass concrete = new ConcreteClass();
-			//Throw event.
-			EventManager.getInstance().throwEvent(new ExampleEvent("Data"));
-			//Thats it! Easy
-		}); 
-    }
-```
-
-> **Expected output:**
-
-> Reflective got a call!
-
 
