@@ -14,6 +14,7 @@ import com.dbteku.javaevents.interfaces.EventListener;
 import com.dbteku.javaevents.interfaces.IEventHandler;
 import com.dbteku.javaevents.interfaces.IEventThrower;
 import com.dbteku.javaevents.models.JavaEvent;
+import com.dbteku.javaevents.models.JavaEventPriority;
 import com.dbteku.javaevents.models.NullEventHandler;
 
 public class EventManager {
@@ -22,7 +23,7 @@ public class EventManager {
 	private static EventManager instance;
 	private final Map<Class<?>, LinkedHashSet<IEventThrower<?>>> EVENT_THROWERS;
 	private Map<Class<?>, EventListenerCenter> EVENT_LISTENERS;
-	private Map<Class<?>, Queue<Object>> QUEUED_LISTENERS;
+	private Map<Class<?>, Queue<QueuedListener>> QUEUED_LISTENERS;
 
 	private EventManager() {
 		this.EVENT_THROWERS = new HashMap<>();
@@ -57,13 +58,13 @@ public class EventManager {
 			}
 			synchronized (QUEUED_LISTENERS) {
 				if(QUEUED_LISTENERS.containsKey(interfaceClass)){
-					Queue<Object> queue = QUEUED_LISTENERS.get(interfaceClass);
+					Queue<QueuedListener> queue = QUEUED_LISTENERS.get(interfaceClass);
 					LinkedHashSet<IEventThrower<?>> throwers = EVENT_THROWERS.get(interfaceClass);
 					for (IEventThrower<?> iEventThrower : throwers) {
 						@SuppressWarnings("unchecked")
 						IEventThrower<T> convertedThrower = convertObject(thrower.getClass(), iEventThrower);
-						for (Object object : queue) {
-							convertedThrower.subscribe(convertObject(interfaceClass, object));
+						for (QueuedListener queuedListener : queue) {
+							convertedThrower.subscribe(convertObject(interfaceClass, queuedListener.getListener()));
 						}
 					}
 					QUEUED_LISTENERS.remove(interfaceClass);
@@ -79,17 +80,17 @@ public class EventManager {
 	public void unregisterThrower(Class<?> interfaceClass, IEventThrower<?> thrower){
 		unregisterThrower(interfaceClass, thrower, false);
 	}
-	
+
 	public void unregisterThrower(Class<?> interfaceClass, IEventThrower<?> thrower, boolean keepSubscribers){
 		synchronized (EVENT_THROWERS) {
 			if(EVENT_THROWERS.containsKey(interfaceClass)){
 				LinkedHashSet<IEventThrower<?>> list = EVENT_THROWERS.get(interfaceClass);
 				if(keepSubscribers){
-					Queue<Object> toKeep = new ArrayDeque<>();
+					Queue<QueuedListener> toKeep = new ArrayDeque<>();
 					Iterator<?> subscribers = thrower.getSubscribers();
 					while(subscribers.hasNext()){
 						Object listener = subscribers.next();
-						toKeep.add(listener);
+						toKeep.add(new QueuedListener(listener, JavaEventPriority.NORMAL));
 					}
 					if(!QUEUED_LISTENERS.containsKey(interfaceClass)){
 						QUEUED_LISTENERS.put(interfaceClass, toKeep);
@@ -120,10 +121,10 @@ public class EventManager {
 				}
 			}else{
 				if(QUEUED_LISTENERS.containsKey(interfaceClass)){
-					QUEUED_LISTENERS.get(interfaceClass).add(listener);
+					QUEUED_LISTENERS.get(interfaceClass).add(new QueuedListener(listener, JavaEventPriority.NORMAL));
 				}else{
-					Queue<Object> queue = new ArrayDeque<>();
-					queue.add(listener);
+					Queue<QueuedListener> queue = new ArrayDeque<>();
+					queue.add(new QueuedListener(listener, JavaEventPriority.NORMAL));
 					QUEUED_LISTENERS.put(interfaceClass, queue);
 				}
 			}
@@ -164,7 +165,13 @@ public class EventManager {
 								Class<?>[] methodParams = methods[i].getParameterTypes();
 								if(methodParams.length >= PARAM && event.getClass().getSimpleName().equals(methodParams[FIRST].getSimpleName())){
 									try {
-										methods[i].invoke(listener, event);
+										if(methods[i].isAccessible()) {
+											methods[i].invoke(listener, event);
+										}else {
+											methods[i].setAccessible(true);
+											methods[i].invoke(listener, event);
+											methods[i].setAccessible(false);
+										}
 									} catch (IllegalAccessException e) {
 										e.printStackTrace();
 									} catch (IllegalArgumentException e) {
@@ -179,9 +186,9 @@ public class EventManager {
 				}, eventClass));
 				synchronized (QUEUED_LISTENERS) {
 					if(QUEUED_LISTENERS.containsKey(eventClass)){
-						Queue<?> queue = QUEUED_LISTENERS.get(eventClass);
-						for (Object object : queue) {
-							EVENT_LISTENERS.get(eventClass).add(object);
+						Queue<QueuedListener> queue = QUEUED_LISTENERS.get(eventClass);
+						for (QueuedListener listener : queue) {
+							EVENT_LISTENERS.get(eventClass).add(listener.getListener(), listener.getPriority());
 						}
 						QUEUED_LISTENERS.remove(eventClass);
 					}	
@@ -189,7 +196,7 @@ public class EventManager {
 			}	
 		}
 	}
-	
+
 	public <E> void unregisterEvent(Class<E> eventClass) {
 		synchronized (EVENT_LISTENERS) {
 			if(EVENT_LISTENERS.containsKey(eventClass)) {
@@ -216,22 +223,26 @@ public class EventManager {
 	}
 
 	public <E, I, L> void registerEventListener(Class<E> eventClass, L listener){
+		registerEventListener(eventClass, listener, JavaEventPriority.NORMAL);
+	}
+
+	public <E, I, L> void registerEventListener(Class<E> eventClass, L listener, JavaEventPriority priority){
 		synchronized (EVENT_LISTENERS) {
 			if(EVENT_LISTENERS.containsKey(eventClass)){
 				EventListenerCenter center = EVENT_LISTENERS.get(eventClass);
 				center.add(listener);
 			}else{
 				if(QUEUED_LISTENERS.containsKey(eventClass)){
-					QUEUED_LISTENERS.get(eventClass).add(listener);
+					QUEUED_LISTENERS.get(eventClass).add(new QueuedListener(listener, priority));
 				}else{
-					Queue<Object> queue = new ArrayDeque<>();
-					queue.add(listener);
+					Queue<QueuedListener> queue = new ArrayDeque<>();
+					queue.add(new QueuedListener(listener, priority));
 					QUEUED_LISTENERS.put(eventClass, queue);
 				}
 			}
 		}
 	}
-	
+
 	public <E, L> void unregisterEventListener(Class<E> eventClass, L listener){
 		synchronized (EVENT_LISTENERS) {
 			if(EVENT_LISTENERS.containsKey(eventClass)) {
@@ -252,20 +263,41 @@ public class EventManager {
 
 	private class EventListenerCenter{
 		private final IEventHandler<?> HANDLER;
-		private final LinkedHashSet<Object> LISTENERS;
+		private Map<JavaEventPriority, LinkedHashSet<Object>> LISTENER_MAP;
 		private final Class<?> EVENT_CLASS;
 
 		private EventListenerCenter(IEventHandler<?> handler, Class<?> eventClass) {
 			this.HANDLER = handler;
-			this.LISTENERS = new LinkedHashSet<>();
+			this.LISTENER_MAP = new HashMap<>();
 			this.EVENT_CLASS = eventClass;
+			setupListeners();
+		}
+
+		private void setupListeners() {
+			JavaEventPriority[] priorities = JavaEventPriority.values();
+			for (JavaEventPriority javaEventPriority : priorities) {
+				LISTENER_MAP.put(javaEventPriority, new LinkedHashSet<>());
+			}
 		}
 
 		private void throwEvent(JavaEvent event){
-			synchronized (LISTENERS) {
-				if(event.getClass().equals(EVENT_CLASS)){
-					Object[] listeners = LISTENERS.toArray();
-					for (Object object : listeners) {
+			LinkedHashSet<Object> listeners = new LinkedHashSet<>();
+			JavaEventPriority[] priorities = JavaEventPriority.values();
+			for (JavaEventPriority javaEventPriority : priorities) {
+				synchronized (LISTENER_MAP) {
+					LinkedHashSet<Object> potential = LISTENER_MAP.get(javaEventPriority);
+					if(potential != null) {
+						listeners = potential;
+					}
+				}
+				if(!listeners.isEmpty()) {
+					Object[] eventListeners = new Object[] {};
+					synchronized (listeners) {
+						if(event.getClass().equals(EVENT_CLASS)){
+							eventListeners = listeners.toArray();
+						}
+					}
+					for (Object object : eventListeners) {
 						HANDLER.handle(event, object);
 					}
 				}	
@@ -273,17 +305,37 @@ public class EventManager {
 		}
 
 		private<L> void add(L listener){
-			synchronized (LISTENERS) {
-				if(!LISTENERS.contains(listener)){
-					LISTENERS.add(listener);
+			add(listener, JavaEventPriority.NORMAL);
+		}
+
+		private<L> void add(L listener, JavaEventPriority priority){
+			LinkedHashSet<Object> listeners = new LinkedHashSet<>();
+			LinkedHashSet<Object> potential = LISTENER_MAP.get(priority);
+			if(potential != null) {
+				listeners = potential;
+			}
+			synchronized (listeners) {
+				if(!listeners.contains(listener)){
+					listeners.add(listener);
 				}	
 			}
 		}
-		
+
 		private <L> void remove(L listener){
-			LISTENERS.remove(listener);
+			remove(listener, JavaEventPriority.NORMAL);
 		}
-		
+
+		private <L> void remove(L listener, JavaEventPriority priority) {
+			LinkedHashSet<Object> listeners = new LinkedHashSet<>();
+			LinkedHashSet<Object> potential = LISTENER_MAP.get(priority);
+			if(potential != null) {
+				listeners = potential;
+			}
+			synchronized (listeners) {
+				listeners.remove(listener);	
+			}
+		}
+
 	}
 
 }
